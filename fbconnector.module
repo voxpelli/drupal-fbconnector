@@ -161,7 +161,7 @@ function _fbconnector_id() {
 function _fbconnector_button() {
   drupal_add_js(array(
     'fbconnector_api_key'     => variable_get('fbconnector_api_key', NULL),
-    'fbconnector_xd_receiver' => check_plain(url(drupal_get_path('module', 'fbconnector') . '/xd_receiver.htm')),
+    'fbconnector_xd_receiver' => check_plain(base_path() . drupal_get_path('module', 'fbconnector') . '/xd_receiver.htm'),
   ), 'setting');
 
   return array(
