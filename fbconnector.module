@@ -85,7 +85,7 @@ function fbconnector_init() {
           if (empty($info['real name'])) {
             _connector_information_update($user->uid, array('real name' => TRUE));
           }
-          drupal_goto();
+          drupal_goto($_GET['q']);
         }
       }
     } catch (Exception $e) {
