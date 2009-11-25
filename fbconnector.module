@@ -6,6 +6,37 @@
  * Connector module
  */
 
+
+/* ************************************************************************* *
+ * THEME FUNCTIONS
+ * ************************************************************************* */
+
+/**
+ * Implementation of hook_theme().
+ */
+function fbconnector_theme() {
+  $theme = array(
+    'fbconnector_button' => array(
+      'arguments' => array(),
+    ),
+  );
+
+  return $theme;
+}
+
+/**
+ * Theme function for the button
+ */
+function theme_fbconnector_button() {
+  drupal_add_js(drupal_get_path('module', 'fbconnector') . '/fbconnector.js', 'theme', 'footer');
+  return '<fb:login-button onlogin="fbconnector_login();"></fb:login-button>';
+}
+
+
+/* ************************************************************************* *
+ * DRUPAL HOOKS
+ * ************************************************************************* */
+
 /**
  * Implementation of hook_connector().
  */
@@ -24,19 +55,6 @@ function fbconnector_connector() {
   }
 
   return $items;
-}
-
-/**
- * Implementation of hook_theme().
- */
-function fbconnector_theme() {
-  $theme = array(
-    'fbconnector_button' => array(
-      'arguments' => array(),
-    ),
-  );
-
-  return $theme;
 }
 
 /**
@@ -101,6 +119,11 @@ function fbconnector_footer() {
   return '<script type="text/javascript" src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"></script>';
 }
 
+
+/* ************************************************************************* *
+ * FACEBOOK INTEGRATION
+ * ************************************************************************* */
+
 function _fbconnector_client() {
   static $fb = NULL;
   if (!$fb instanceof Facebook) {
@@ -116,9 +139,14 @@ function _fbconnector_client() {
  * Avatar callback
  */
 function _fbconnector_avatar($cid) {
-  $result = _fbconnector_client()->api_client->users_getInfo($cid, array(
-    'pic_square_with_logo',
-  ));
+  try {
+    $result = _fbconnector_client()->api_client->users_getInfo($cid, array(
+      'pic_square_with_logo',
+    ));
+  }
+  catch (FacebookRestClientException $e) {
+    return FALSE;
+  }
   return empty($result) ? FALSE : $result[0]['pic_square_with_logo'];
 }
 
@@ -129,9 +157,14 @@ function _fbconnector_info($cid, $types = NULL) {
   $info = array();
 
   if (empty($types) || !empty($types['real name'])) {
-    $result = _fbconnector_client()->api_client->users_getInfo($cid, array(
-      'name',
-    ));
+    try {
+      $result = _fbconnector_client()->api_client->users_getInfo($cid, array(
+        'name',
+      ));
+    }
+    catch (FacebookRestClientException $e) {
+      return FALSE;
+    }
     $info['real name'] = empty($result) ? FALSE : $result[0]['name'];
   }
 
@@ -177,12 +210,4 @@ function fbconnector_log_in_form() {
   return array(
     'fbconnector' => array('#type' => 'value', '#value' => TRUE),
   );
-}
-
-/**
- * Theme function for the button
- */
-function theme_fbconnector_button() {
-  drupal_add_js(drupal_get_path('module', 'fbconnector') . '/fbconnector.js', 'theme', 'footer');
-  return '<fb:login-button onlogin="fbconnector_login();"></fb:login-button>';
 }
