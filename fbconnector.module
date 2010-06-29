@@ -138,7 +138,7 @@ function _fbconnector_client() {
 /**
  * Avatar callback
  */
-function _fbconnector_avatar($cid) {
+function _fbconnector_avatar($connector, $cid) {
   try {
     $result = _fbconnector_client()->api_client->users_getInfo($cid, array(
       'pic_square_with_logo',
@@ -153,7 +153,7 @@ function _fbconnector_avatar($cid) {
 /**
  * Information callback
  */
-function _fbconnector_info($cid, $types = NULL) {
+function _fbconnector_info($connector, $cid, $types = NULL) {
   $info = array();
 
   if (empty($types) || !empty($types['real name'])) {
@@ -174,7 +174,7 @@ function _fbconnector_info($cid, $types = NULL) {
 /**
  * Logout callback
  */
-function _fbconnector_logout($cid) {
+function _fbconnector_logout($connector, $cid) {
   $client = _fbconnector_client();
   if ($client->get_loggedin_user() == $cid) {
     $client->clear_cookie_state();
@@ -184,14 +184,14 @@ function _fbconnector_logout($cid) {
 /**
  * Connector ID callback
  */
-function _fbconnector_id() {
+function _fbconnector_id($connector) {
   return _fbconnector_client()->get_loggedin_user();
 }
 
 /**
  * Connector button callback
  */
-function _fbconnector_button() {
+function _fbconnector_button($connector) {
   drupal_add_js(array(
     'fbconnector_api_key'     => variable_get('fbconnector_api_key', NULL),
     'fbconnector_xd_receiver' => check_plain(base_path() . drupal_get_path('module', 'fbconnector') . '/xd_receiver.htm'),
