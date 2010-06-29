@@ -45,6 +45,7 @@ function fbconnector_connector() {
 
   if (variable_get('fbconnector_api_key', NULL) && variable_get('fbconnector_application_secret', NULL)) {
     $items['fbconnector'] = array(
+      'title'                => 'Facebook',
       'button callback'      => '_fbconnector_button',
       'id callback'          => '_fbconnector_id',
       'logout callback'      => '_fbconnector_logout',
@@ -119,6 +120,18 @@ function fbconnector_footer() {
   return '<script type="text/javascript" src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"></script>';
 }
 
+/**
+ * Implementation of hook_form_alter().
+ */
+function fbconnector_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'connector_button_form' && isset($form['fbconnector'])) {
+    $form['fbconnector']['#attributes'] = array('style' => 'display: none;');
+    if (!isset($form['fbconnector']['#pre_render'])) {
+      $form['fbconnector']['#pre_render'] = array();
+    }
+    array_unshift($form['fbconnector']['#pre_render'], 'fbconnector_button_pre_render');
+  }
+}
 
 /* ************************************************************************* *
  * FACEBOOK INTEGRATION
@@ -191,23 +204,16 @@ function _fbconnector_id($connector) {
 /**
  * Connector button callback
  */
-function _fbconnector_button($connector) {
+function _fbconnector_button($form, &$form_state) {
+  // Intentionally left blank - we don't do anything on the form submit itself
+  // We do it in hook_init() and redirects prior to getting here.
+}
+
+function fbconnector_button_pre_render($element) {
   drupal_add_js(array(
     'fbconnector_api_key'     => variable_get('fbconnector_api_key', NULL),
     'fbconnector_xd_receiver' => check_plain(base_path() . drupal_get_path('module', 'fbconnector') . '/xd_receiver.htm'),
   ), 'setting');
-
-  return array(
-    'title' => theme('fbconnector_button') . drupal_get_form('fbconnector_log_in_form'),
-    'html'  => TRUE,
-  );
-}
-
-/**
- * Form for triggering log in (escaping the caching)
- */
-function fbconnector_log_in_form() {
-  return array(
-    'fbconnector' => array('#type' => 'value', '#value' => TRUE),
-  );
+  $element['#prefix'] = theme('fbconnector_button');
+  return $element;
 }

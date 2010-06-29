@@ -1,5 +1,5 @@
 function fbconnector_login() {
-  jQuery('#fbconnector-log-in-form').submit();
+  jQuery('.connector-fbconnector .form-submit').click();
 }
 
 FB.Bootstrap.requireFeatures(["Connect"], function() {
