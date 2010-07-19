@@ -51,7 +51,8 @@ function fbconnector_connector() {
       'logout callback'      => '_fbconnector_logout',
       'information callback' => '_fbconnector_info',
       'avatar callback'      => '_fbconnector_avatar',
-      'cache'                => 86400, //24 hours x 3600 seconds per hour
+      'cache'                => 72000, //20 hours x 3600 seconds per hour
+      'invalidate old info'  => TRUE,
     );
   }
 
